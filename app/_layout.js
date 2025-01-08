@@ -1,19 +1,29 @@
-import { View, StyleSheet } from "react-native";
-import { Slot } from "expo-router";
+import { View, StyleSheet, Text } from "react-native";
+import { Stack } from "expo-router";
+import theme from "../styles/theme";
 export default function Layout() {
   return (
     <View style={styles.container}>
-      <Slot />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: theme.colors.primary },
+          headerTintColor: "yellow",
+          headerTitle: "",
+          headerLeft: () => <Text style={styles.title}>Home</Text>,
+        }}
+      />
     </View>
   );
 }
-//SLOT cambiara STACK
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "start",
+  },
+  title: {
+    fontSize: 20,
+    color: "#FFFFFF", // Color blanco para el texto
+    fontWeight: "bold",
   },
 });

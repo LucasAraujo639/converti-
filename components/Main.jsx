@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Image, TextInput } from "react-native";
+import { StyleSheet, View, StatusBar } from "react-native";
 import { Link } from "expo-router";
 import InputField from "../components/InputField";
 import theme from "../styles/theme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomButton } from "./buttons/CustomButton";
 import { useRouter } from "expo-router";
+import { LogoImage } from "./images/Images";
 export default function Main() {
   const [text, setText] = useState("");
   const router = useRouter();
 
   const [error, setError] = useState("");
-  const insets = useSafeAreaInsets();
 
   const handleInputChange = (input) => {
     setText(input);
@@ -22,35 +21,56 @@ export default function Main() {
     }
   };
 
-  const handleBackPress = () => {
+  const handleOnPress = () => {
     // Lógica para manejar el retroceso (por ejemplo, navegación)
     router.push("/operaciones");
   };
 
   return (
-    <View
-      style={{
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-        backgroundColor: "#000",
-      }}
-    >
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light" />
+      <View>
+        <View style={styles.imageLogoContainer}>
+          <LogoImage style={styles.logo} />
+        </View>
         <Link href="/operaciones" asChild>
           <CustomButton
-            text="Ir a Operaciones"
-            backgroundColor="#F00"
-            backgroundColorHover="#FF0"
-            handleAction={handleBackPress}
+            text="Operaciones"
+            textColor={theme.colors.text}
+            backgroundColor={theme.colors.primary}
+            backgroundColorHover={theme.colors.primaryPressed}
+            handleAction={handleOnPress}
           />
         </Link>
-        <InputField
-          text="Titulo"
-          textColor={theme.colors.inputInactive}
-          borderColor={theme.colors.inputInactive}
-          value={text}
-          onChangeText={handleInputChange}
-        />
+
+        <Link href="/operaciones" asChild>
+          <CustomButton
+            text="Portafolio"
+            textColor={theme.colors.text}
+            backgroundColor={theme.colors.primary}
+            backgroundColorHover={theme.colors.primaryPressed}
+            handleAction={handleOnPress}
+          />
+        </Link>
+
+        <Link href="/operaciones" asChild>
+          <CustomButton
+            text="Analisis"
+            textColor={theme.colors.text}
+            backgroundColor={theme.colors.primary}
+            backgroundColorHover={theme.colors.primaryPressed}
+            handleAction={handleOnPress}
+          />
+        </Link>
+        <Link href="/operaciones" asChild>
+          <CustomButton
+            text="Configuracion"
+            textColor={theme.colors.text}
+            backgroundColor={theme.colors.primary}
+            backgroundColorHover={theme.colors.primaryPressed}
+            handleAction={handleOnPress}
+          />
+        </Link>
       </View>
     </View>
   );
@@ -66,5 +86,14 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 18,
     color: "blue",
+  },
+  imageLogoContainer: {
+    alignItems: "center",
+    marginTop: 50,
+    marginBottom: 50, // Mueve el logo un poco hacia arriba
+  },
+  logo: {
+    width: 100, // Ajusta el ancho del logo
+    height: 100, // Ajusta la altura del logo
   },
 });
