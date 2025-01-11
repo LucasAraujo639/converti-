@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Pressable, View, StyleSheet } from "react-native";
+import { Text, Pressable, StyleSheet } from "react-native";
 
 export const CustomButton = ({
   text,

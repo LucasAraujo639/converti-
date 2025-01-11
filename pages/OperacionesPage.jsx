@@ -4,45 +4,19 @@ import { Stack } from "expo-router";
 import theme from "../styles/theme";
 import { CustomButton } from "../components/buttons/CustomButton";
 import OperationItem from "../components/items/OperationItem";
-export default function OperacionesPage() {
-  // Mock de operaciones
-  const operations = [
-    {
-      letter: "A",
-      name: "MC Donalds",
-      size: 40,
-      backgroundColor: "#FF5733",
-      textColor: "#fff",
-    },
-    {
-      letter: "B",
-      name: "Burger King",
-      size: 40,
-      backgroundColor: "#FF4500",
-      textColor: "#fff",
-    },
-    {
-      letter: "C",
-      name: "KFC",
-      size: 40,
-      backgroundColor: "#FF6347",
-      textColor: "#fff",
-    },
-    {
-      letter: "D",
-      name: "Subway",
-      size: 40,
-      backgroundColor: "#32CD32",
-      textColor: "#fff",
-    },
-  ];
+import { useOperations } from "../context/OperationsContext";
 
+export default function OperacionesPage() {
+  const { operations, deleteOperation } = useOperations();
   const router = useRouter();
   const handleOnPress = () => {
     // Lógica para manejar el retroceso (por ejemplo, navegación)
     router.push("/cargarOperacion");
   };
 
+  const handleDelete = (id) => {
+    deleteOperation(id); // Llama a la función de eliminación
+  };
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -56,17 +30,35 @@ export default function OperacionesPage() {
       />
 
       <ScrollView style={styles.operationsContainer}>
-        <View style={styles.operationContour}>
-          {operations.map((operation, index) => (
-            <OperationItem
-              key={index}
-              letter={operation.letter}
-              name={operation.name}
-              size={operation.size}
-              backgroundColor={operation.backgroundColor}
-              textColor={operation.textColor}
-            />
-          ))}
+        <View style={styles.operationContourContainer}>
+          <View style={styles.operationContour}>
+            {operations.length > 0 ? (
+              operations.map((operation, index) => (
+                <OperationItem
+                  key={operation.id}
+                  id={operation.id}
+                  letter={operation.titulo.slice(0, 2)}
+                  size="40"
+                  name={operation.titulo}
+                  backgroundColor="#FF4500"
+                  textColor="#fff"
+                  onDelete={() => handleDelete(operation.id)}
+                  onEdit={(id) =>
+                    router.push({
+                      pathname: "/cargarOperacion",
+                      params: { id: operation.id },
+                    })
+                  }
+                />
+              ))
+            ) : (
+              <Text
+                style={{ color: "white", textAlign: "center", marginTop: 20 }}
+              >
+                No hay operaciones registradas.
+              </Text>
+            )}
+          </View>
         </View>
       </ScrollView>
 
@@ -92,13 +84,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "start",
   },
+
+  operationContourContainer: {
+    margin: "auto",
+    width: "95%",
+    height: "100%",
+    backgroundColor: "#1A0B70", // primary color
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 20,
+    marginBottom: 140,
+  },
   operationContour: {
-    margin: 20,
+    margin: "auto",
     width: "90%",
     height: "100%",
     backgroundColor: "#1A0B70", // primary color
     borderRadius: 10,
+    marginTop: 20,
   },
+
   operationsContainer: {
     flex: 1, // Esto permite que el contenido se desplace
     width: "100%",
@@ -106,15 +111,15 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     position: "absolute", // Mantén el botón fijo en la parte inferior
-    bottom: 10, // Colócalo 20px desde el borde inferior
+    bottom: 0, // Colócalo 20px desde el borde inferior
     left: 0,
     right: 0,
     backgroundColor: "#1A0B70", // Fondo del botón
-    paddingVertical: 50,
+    paddingVertical: 60,
   },
   actionButtonBox: {
     position: "absolute", // Mantén el botón fijo en la parte inferior
-    bottom: 60, // Colócalo 20px desde el borde inferior
+    bottom: 70, // Colócalo 20px desde el borde inferior
     left: 100,
     right: 0,
     width: 200,

@@ -6,6 +6,7 @@ import { Pressable } from "react-native"; // Usando Pressable
 import CustomAvatar from "../avatar/CustomAvatar";
 
 export default function OperationItem({
+  id,
   letter,
   size,
   name,
@@ -18,16 +19,16 @@ export default function OperationItem({
 
       <View style={styles.iconsContainer}>
         <Pressable
-          onPress={onEdit}
+          onPress={() => onEdit(id)}
           style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
         >
-          <Icon name="edit" size={24} color="#4CAF50" style={styles.icon} />
+          <Icon name="edit" size={26} color="#4CAF50" style={styles.icon} />
         </Pressable>
         <Pressable
           onPress={onDelete}
           style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
         >
-          <Icon name="trash" size={24} color="#F44336" style={styles.icon} />
+          <Icon name="trash" size={26} color="#F44336" style={styles.icon} />
         </Pressable>
       </View>
     </View>
