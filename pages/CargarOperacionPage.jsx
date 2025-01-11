@@ -1,19 +1,10 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TextInput,
-  Platform,
-  Modal,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { View, StyleSheet, Text, ScrollView, TextInput } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
 import theme from "../styles/theme";
 import { CustomButton } from "../components/buttons/CustomButton";
 import { useEffect, useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
 import { useOperations } from "../context/OperationsContext";
 import { DolarCCLUtils } from "../utils/dolarCCLUtils";
 import { DatePicker } from "../components/date_picker/DatePicker";
@@ -127,7 +118,6 @@ export default function CargarOperacionPage() {
   };
 
   const handleDateChange = (event, selectedDate) => {
-    console.log("selected date0", selectedDate);
     if (selectedDate) {
       setTempDate(selectedDate);
     }

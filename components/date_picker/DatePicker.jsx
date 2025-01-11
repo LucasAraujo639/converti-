@@ -21,7 +21,6 @@ export const DatePicker = ({
     tempDate instanceof Date && !isNaN(tempDate) ? tempDate : new Date();
 
   const onDateChange = (event, selectedDate) => {
-    console.log("AAAA CAMBIANDO", selectedDate);
     if (selectedDate) {
       // Actualiza el estado de la fecha seleccionada (en tempDate)
       handleDateChange(event, selectedDate);

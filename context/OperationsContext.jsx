@@ -108,6 +108,35 @@ export const OperationsProvider = ({ children }) => {
     return operations.find((op) => op.id === parseInt(id, 10)); // necesario parsear para comparar int con int
   };
 
+  const getAveragePurchasePriceAction = (name) => {
+    console.log("OPERATIONS", operations);
+
+    // Filtrar las operaciones de tipo 'compra' con el nombre indicado
+    const purchaseOperations = operations.filter(
+      (op) => op.tipo === "compra" && op.titulo === name
+    );
+
+    // Si no hay operaciones, el promedio es 0
+    if (purchaseOperations.length === 0) {
+      return 0;
+    }
+
+    // Sumar precioTotalUSD y cantidades
+    const totalUSD = purchaseOperations.reduce(
+      (acc, op) => acc + parseFloat(op.precioTotalUSD),
+      0
+    );
+
+    const totalQuantity = purchaseOperations.reduce(
+      (acc, op) => acc + parseFloat(op.cantidad),
+      0
+    );
+    console.log("totalUSD: ", totalUSD);
+    console.log("totalquantity: ", totalQuantity);
+    // Calcular el promedio
+    return totalQuantity > 0 ? totalUSD / totalQuantity : 0;
+  };
+
   return (
     <OperationsContext.Provider
       value={{
@@ -116,6 +145,7 @@ export const OperationsProvider = ({ children }) => {
         updateOperation,
         deleteOperation,
         getOperationById,
+        getAveragePurchasePriceAction,
       }}
     >
       {children}

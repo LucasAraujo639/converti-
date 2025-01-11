@@ -6,24 +6,36 @@ import theme from "../styles/theme";
 import { CustomButton } from "./buttons/CustomButton";
 import { useRouter } from "expo-router";
 import { LogoImage } from "./images/Images";
+
 export default function Main() {
-  const [text, setText] = useState("");
   const router = useRouter();
 
-  const [error, setError] = useState("");
+  // Manejar la navegación dinámica según la ruta
+  const handleOnPress = (path) => {
+    switch (path) {
+      case "/operaciones":
+        console.log("Navegando a Operaciones...");
+        router.push("/operaciones");
+        break;
 
-  const handleInputChange = (input) => {
-    setText(input);
-    if (input === "") {
-      setError("Este campo es obligatorio.");
-    } else {
-      setError("");
+      case "/portfolio":
+        console.log("Navegando a Portafolio...");
+        router.push("/portfolio");
+        break;
+
+      case "/analisis":
+        console.log("Navegando a Análisis...");
+        router.push("/analisis");
+        break;
+
+      case "/configuration":
+        console.log("Navegando a Configuración...");
+        router.push("/configuration");
+        break;
+
+      default:
+        console.warn("Ruta desconocida:", path);
     }
-  };
-
-  const handleOnPress = () => {
-    // Lógica para manejar el retroceso (por ejemplo, navegación)
-    router.push("/operaciones");
   };
 
   return (
@@ -33,42 +45,48 @@ export default function Main() {
         <View style={styles.imageLogoContainer}>
           <LogoImage style={styles.logo} />
         </View>
+
+        {/* Botón para Operaciones */}
         <Link href="/operaciones" asChild>
           <CustomButton
             text="Operaciones"
             textColor={theme.colors.text}
             backgroundColor={theme.colors.primary}
             backgroundColorHover={theme.colors.primaryPressed}
-            handleAction={handleOnPress}
+            handleAction={() => handleOnPress("/operaciones")}
           />
         </Link>
 
-        <Link href="/operaciones" asChild>
+        {/* Botón para Portafolio */}
+        <Link href="/portfolio" asChild>
           <CustomButton
             text="Portafolio"
             textColor={theme.colors.text}
             backgroundColor={theme.colors.primary}
             backgroundColorHover={theme.colors.primaryPressed}
-            handleAction={handleOnPress}
+            handleAction={() => handleOnPress("/portfolio")}
           />
         </Link>
 
-        <Link href="/operaciones" asChild>
+        {/* Botón para Análisis */}
+        <Link href="/analisis" asChild>
           <CustomButton
-            text="Analisis"
+            text="Análisis"
             textColor={theme.colors.text}
             backgroundColor={theme.colors.primary}
             backgroundColorHover={theme.colors.primaryPressed}
-            handleAction={handleOnPress}
+            handleAction={() => handleOnPress("/analisis")}
           />
         </Link>
-        <Link href="/operaciones" asChild>
+
+        {/* Botón para Configuración */}
+        <Link href="/configuration" asChild>
           <CustomButton
-            text="Configuracion"
+            text="Configuración"
             textColor={theme.colors.text}
             backgroundColor={theme.colors.primary}
             backgroundColorHover={theme.colors.primaryPressed}
-            handleAction={handleOnPress}
+            handleAction={() => handleOnPress("/configuration")}
           />
         </Link>
       </View>
