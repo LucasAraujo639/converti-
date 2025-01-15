@@ -12,6 +12,7 @@ export const useOperations = () => {
 // El proveedor del contexto
 export const OperationsProvider = ({ children }) => {
   const [operations, setOperations] = useState([]);
+  const [showMessage, setShowMessage] = useState(false);
 
   // Cargar operaciones almacenadas al iniciar
   useEffect(() => {
@@ -109,8 +110,6 @@ export const OperationsProvider = ({ children }) => {
   };
 
   const getAveragePurchasePriceAction = (name) => {
-    console.log("OPERATIONS", operations);
-
     // Filtrar las operaciones de tipo 'compra' con el nombre indicado
     const purchaseOperations = operations.filter(
       (op) => op.tipo === "compra" && op.titulo === name
@@ -146,6 +145,8 @@ export const OperationsProvider = ({ children }) => {
         deleteOperation,
         getOperationById,
         getAveragePurchasePriceAction,
+        showMessage,
+        setShowMessage,
       }}
     >
       {children}
