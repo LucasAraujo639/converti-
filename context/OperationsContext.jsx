@@ -12,7 +12,7 @@ export const useOperations = () => {
 // El proveedor del contexto
 export const OperationsProvider = ({ children }) => {
   const [operations, setOperations] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
+  const [showMessagge, setShowMessagge] = useState(false);
 
   // Cargar operaciones almacenadas al iniciar
   useEffect(() => {
@@ -145,8 +145,8 @@ export const OperationsProvider = ({ children }) => {
         deleteOperation,
         getOperationById,
         getAveragePurchasePriceAction,
-        showMessage,
-        setShowMessage,
+        showMessagge,
+        setShowMessagge,
       }}
     >
       {children}

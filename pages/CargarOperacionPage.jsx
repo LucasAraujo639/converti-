@@ -1,121 +1,24 @@
-import { View, StyleSheet, Text, ScrollView, TextInput } from "react-native";
+import React, { useState } from "react";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
 import theme from "../styles/theme";
 import { CustomButton } from "../components/buttons/CustomButton";
-import { useEffect, useState } from "react";
-
-import { useOperations } from "../context/OperationsContext";
-import { DolarCCLUtils } from "../utils/dolarCCLUtils";
 import { DatePicker } from "../components/date_picker/DatePicker";
-
+import { OperationFormInput } from "../components/forms/OperationFormInput";
+import { useOperationForm } from "../hooks/useOperationForm";
 export default function CargarOperacionPage() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { addOperation, updateOperation, getOperationById } = useOperations();
-
+  const {
+    formData,
+    handleInputChange,
+    handleSubmit,
+    tipoOptions,
+    monedaOptions,
+  } = useOperationForm(id);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState(null);
-  const [dollarData, setDollarData] = useState(null);
-  const [formData, setFormData] = useState({
-    fecha: "",
-    titulo: "",
-    cantidad: "",
-    tipo: "",
-    moneda: "",
-    cotizacion: "",
-    ccl: "",
-    precioTotal: "",
-    precioTotalUSD: "",
-  });
-
-  // Carga los datos si se está editando
-  useEffect(() => {
-    if (id) {
-      const operation = getOperationById(id);
-      if (operation) setFormData(operation);
-    }
-  }, [id]);
-
-  //Cambia el dolar ccl cuando la fecha cambia
-  useEffect(() => {
-    const fetchDollarValue = async () => {
-      if (formData.fecha) {
-        try {
-          // Esperamos a que la promesa se resuelva antes de continuar
-          const DolarCclValue = await DolarCCLUtils.getDollarValue(
-            formData.fecha,
-            formData.tipo
-          );
-
-          // Actualizamos el estado con el valor de DolarCclValue
-          setDollarData(DolarCclValue);
-
-          // Actualizamos formData con el valor de ccl
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            ccl: DolarCclValue,
-          }));
-        } catch (error) {
-          console.log("Error fetching dollar value:", error);
-        }
-      }
-    };
-
-    fetchDollarValue();
-  }, [formData.fecha, formData.tipo]);
-
-  const handleInputDateChange = (name, value) => {
-    setFormData((prevFormData) => {
-      const updatedData = { ...prevFormData, [name]: value };
-
-      // Asegurarse de que recalcularPrecios no muta el objeto original
-      const recalculatedData = recalcularPrecios({ ...updatedData });
-
-      // Actualizar el estado con los datos recalculados
-      return recalculatedData;
-    });
-  };
-
-  //TODO: Funcion secundaria lo puedo poner en otro componente
-  const recalcularPrecios = (updatedData) => {
-    const cantidad = parseFloat(updatedData.cantidad) || 0;
-    const cotizacion = parseFloat(updatedData.cotizacion) || 0;
-    const ccl = parseFloat(updatedData.ccl) || 0;
-    const moneda = updatedData.moneda;
-    const tipo = updatedData.tipo; // Obtener el tipo de operación (compra/venta)
-
-    // Si el tipo es 'compra', usamos el valor de compra para ccl, si es 'venta' usamos el de venta
-    const cclValue = tipo === "compra" ? dollarData?.compra : dollarData?.venta;
-
-    // Si hay un valor de ccl proporcionado en el input, lo usamos, de lo contrario, usamos el valor calculado
-    const finalCcl = ccl || cclValue;
-
-    // Verificación antes de realizar operaciones con valores numéricos
-    if (isNaN(cantidad) || isNaN(cotizacion) || isNaN(finalCcl)) {
-      console.error(
-        "Error: uno de los valores proporcionados no es un número válido"
-      );
-      return updatedData;
-    }
-
-    const precioTotal = cantidad * cotizacion;
-
-    const precioTotalUSD =
-      moneda === "ARS" ? precioTotal / finalCcl : precioTotal;
-
-    updatedData.precioTotal = !isNaN(precioTotal)
-      ? precioTotal.toFixed(2).toString()
-      : "0.00";
-    updatedData.precioTotalUSD = !isNaN(precioTotalUSD)
-      ? precioTotalUSD.toFixed(2).toString()
-      : "0.00";
-    updatedData.ccl = !isNaN(finalCcl)
-      ? finalCcl.toFixed(2).toString()
-      : "0.00"; // Actualizamos el campo ccl
-
-    return updatedData;
-  };
 
   const handleDateChange = (event, selectedDate) => {
     if (selectedDate) {
@@ -130,19 +33,13 @@ export default function CargarOperacionPage() {
       const year = tempDate.getFullYear();
       const formattedDate = `${day}-${month}-${year}`;
 
-      handleInputDateChange("fecha", formattedDate);
+      handleInputChange("fecha", formattedDate);
       setShowDatePicker(false);
     }
   };
 
   const handleOnPress = () => {
-    if (id) {
-      updateOperation(id, formData);
-    } else {
-      addOperation({
-        ...formData,
-      });
-    }
+    handleSubmit();
     router.back();
   };
 
@@ -162,37 +59,34 @@ export default function CargarOperacionPage() {
           {Object.keys(formData)
             .filter((key) => key !== "id")
             .map((key) => (
-              <View key={key} style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </Text>
-                {key === "fecha" ? (
-                  <TextInput
-                    style={styles.input}
-                    value={formData[key]}
-                    placeholder="Selecciona una fecha"
-                    placeholderTextColor="#D9E8F5"
-                    onFocus={() => setShowDatePicker(true)}
-                  />
-                ) : (
-                  <TextInput
-                    style={styles.input}
-                    value={formData[key]}
-                    onChangeText={(value) => handleInputDateChange(key, value)}
-                    placeholder={`Ingresa ${key}`}
-                    placeholderTextColor="#D9E8F5"
-                    keyboardType={
-                      key === "cantidad" ||
-                      key === "precioTotal" ||
-                      key === "precioTotalUSD" ||
-                      key === "ccl" ||
-                      key === "cotizacion"
-                        ? "numeric"
-                        : "default"
-                    }
-                  />
-                )}
-              </View>
+              <OperationFormInput
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                value={formData[key]}
+                onChangeText={(value) => handleInputChange(key, value)}
+                placeholder={`Ingresa ${key}`}
+                keyboardType={
+                  [
+                    "cantidad",
+                    "precioTotal",
+                    "precioTotalUSD",
+                    "ccl",
+                    "cotizacion",
+                  ].includes(key)
+                    ? "numeric"
+                    : "default"
+                }
+                onFocus={
+                  key === "fecha" ? () => setShowDatePicker(true) : undefined
+                }
+                options={
+                  key === "tipo"
+                    ? tipoOptions
+                    : key === "moneda"
+                      ? monedaOptions
+                      : undefined
+                }
+              />
             ))}
         </View>
       </ScrollView>
@@ -242,40 +136,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A0B70",
     borderRadius: 10,
     padding: 15,
-  },
-
-  inputContainer: {
-    marginBottom: 15,
-  },
-
-  inputLabel: {
-    color: "#D9E8F5",
-    fontSize: 14,
-    marginBottom: 5,
-  },
-
-  input: {
-    height: 40,
-    borderColor: "#D9E8F5",
-    borderWidth: 0.5,
-    borderRadius: 5,
-    paddingLeft: 10,
-    color: "#D9E8F5",
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  dateContainer: {
-    width: "90%",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
   },
 
   actionButtonContainer: {
