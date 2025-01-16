@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Modal,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
 import theme from "../styles/theme";
@@ -7,6 +14,7 @@ import { CustomButton } from "../components/buttons/CustomButton";
 import { DatePicker } from "../components/date_picker/DatePicker";
 import { OperationFormInput } from "../components/forms/OperationFormInput";
 import { useOperationForm } from "../hooks/useOperationForm";
+
 export default function CargarOperacionPage() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
@@ -17,8 +25,13 @@ export default function CargarOperacionPage() {
     tipoOptions,
     monedaOptions,
   } = useOperationForm(id);
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalOptions, setModalOptions] = useState([]);
+  const [selectedField, setSelectedField] = useState("");
 
   const handleDateChange = (event, selectedDate) => {
     if (selectedDate) {
@@ -43,15 +56,26 @@ export default function CargarOperacionPage() {
     router.back();
   };
 
+  const openModal = (field, options) => {
+    setSelectedField(field);
+    setModalOptions(options);
+    setModalVisible(true);
+  };
+
+  const confirmModalSelection = (value) => {
+    handleInputChange(selectedField, value);
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
         options={{
           headerStyle: { backgroundColor: theme.colors.primary },
           headerTintColor: theme.colors.secondary,
-          headerLeft: () => {},
+          headerLeft: () => null,
           headerTitle: "Cargar Operaciones",
-          headerRight: () => {},
+          headerRight: () => null,
         }}
       />
       <ScrollView style={styles.operationsContainer}>
@@ -77,29 +101,26 @@ export default function CargarOperacionPage() {
                     : "default"
                 }
                 onFocus={
-                  key === "fecha" ? () => setShowDatePicker(true) : undefined
-                }
-                options={
-                  key === "tipo"
-                    ? tipoOptions
-                    : key === "moneda"
-                      ? monedaOptions
-                      : undefined
+                  key === "fecha"
+                    ? () => setShowDatePicker(true)
+                    : key === "tipo"
+                      ? () => openModal("tipo", tipoOptions)
+                      : key === "moneda"
+                        ? () => openModal("moneda", monedaOptions)
+                        : undefined
                 }
               />
             ))}
         </View>
       </ScrollView>
 
-      {showDatePicker && (
-        <DatePicker
-          showDatePicker={showDatePicker}
-          setShowDatePicker={setShowDatePicker}
-          tempDate={tempDate}
-          handleDateChange={handleDateChange}
-          handleDateConfirm={handleDateConfirm}
-        />
-      )}
+      <DatePicker
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+        tempDate={tempDate}
+        handleDateChange={handleDateChange}
+        handleDateConfirm={handleDateConfirm}
+      />
 
       <View style={styles.actionButtonContainer}>
         <View style={styles.actionButtonBox}>
@@ -112,6 +133,33 @@ export default function CargarOperacionPage() {
           />
         </View>
       </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {modalOptions.map((option) => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => confirmModalSelection(option)}
+                style={styles.modalOption}
+              >
+                <Text style={styles.modalOptionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.modalCloseButton}
+            >
+              <Text style={styles.modalCloseText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -122,14 +170,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     alignItems: "center",
   },
-
   operationsContainer: {
     flex: 1,
     width: "100%",
     backgroundColor: "#00002D",
     marginBottom: 100,
   },
-
   operationContour: {
     margin: 20,
     width: "90%",
@@ -137,21 +183,48 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
   },
-
   actionButtonContainer: {
-    position: "absolute", // Mantén el botón fijo en la parte inferior
-    bottom: 0, // Colócalo 20px desde el borde inferior
+    position: "absolute",
+    bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#1A0B70", // Fondo del botón
+    backgroundColor: "#1A0B70",
     paddingVertical: 60,
   },
   actionButtonBox: {
-    position: "absolute", // Mantén el botón fijo en la parte inferior
-    bottom: 70, // Colócalo 20px desde el borde inferior
+    position: "absolute",
+    bottom: 70,
     left: 100,
     right: 0,
     width: 200,
     height: 80,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+  },
+  modalOption: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  modalOptionText: {
+    fontSize: 16,
+  },
+  modalCloseButton: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+  modalCloseText: {
+    color: theme.colors.accent,
+    fontWeight: "bold",
   },
 });

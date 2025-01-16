@@ -110,9 +110,9 @@ export const OperationsProvider = ({ children }) => {
   };
 
   const getAveragePurchasePriceAction = (name) => {
-    // Filtrar las operaciones de tipo 'compra' con el nombre indicado
+    // Filtrar las operaciones de tipo 'Compra' con el nombre indicado
     const purchaseOperations = operations.filter(
-      (op) => op.tipo === "compra" && op.titulo === name
+      (op) => op.tipo === "Compra" && op.titulo === name
     );
 
     // Si no hay operaciones, el promedio es 0

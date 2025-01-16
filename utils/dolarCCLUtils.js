@@ -7,7 +7,7 @@ export const DolarCCLUtils = {
       console.log("CACA");
       console.log(data);
       // Recalcular el ccl con la nueva cotización
-      const cclValue = tipo === "compra" ? data?.compra : data?.venta;
+      const cclValue = tipo === "Compra" ? data?.compra : data?.venta;
       return cclValue.toFixed(2);
     } catch (err) {
       console.log("Failed to fetch data", err);

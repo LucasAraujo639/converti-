@@ -8,7 +8,7 @@ export const useOperationForm = (id) => {
     fecha: "",
     titulo: "",
     cantidad: "",
-    tipo: "compra", // Valor por defecto
+    tipo: "Compra", // Valor por defecto
     moneda: "ARS", // Valor por defecto
     cotizacion: "",
     ccl: "",
@@ -17,7 +17,7 @@ export const useOperationForm = (id) => {
   });
   const [dollarData, setDollarData] = useState(null);
 
-  const tipoOptions = ["compra", "venta"];
+  const tipoOptions = ["Compra", "Venta"];
   const monedaOptions = ["ARS", "USD"];
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export const useOperationForm = (id) => {
     const moneda = updatedData.moneda;
     const tipo = updatedData.tipo;
 
-    const cclValue = tipo === "compra" ? dollarData?.compra : dollarData?.venta;
+    const cclValue = tipo === "Compra" ? dollarData?.compra : dollarData?.venta;
     const finalCcl = ccl || cclValue;
 
     if (isNaN(cantidad) || isNaN(cotizacion) || isNaN(finalCcl)) {
